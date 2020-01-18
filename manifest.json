@@ -1,0 +1,20 @@
+{
+  "id": "9a0c8462",
+  "name": "Color Reveal",
+  "version": "0.0.1",
+  "description": "WIP",
+  "languages": ["en"],
+  "author": "Marcell Kiss",
+  "helpUrl": "www.google.com",
+  "host": {
+    "app": "XD",
+    "minVersion": "21.0"
+  },
+  "uiEntryPoints": [
+    {
+      "type": "panel",
+      "label": "Color Reveal",
+      "panelId": "colorReveal"
+    }
+  ]
+}
