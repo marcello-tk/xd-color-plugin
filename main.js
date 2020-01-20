@@ -37,7 +37,7 @@ function generateLayout() {
             width: 40px;
         }
     </style>
-    <ul id="color-list">
+    <ul>
         <li>
             <div id="color-first" class="input-color-container">
                 <input type="text" value="Orange" maxlength=6 />
@@ -51,6 +51,7 @@ function generateLayout() {
             </div>
         </li>
     </ul>
+    <ul id="color-list"></ul>
     <div style="text-align: center;">
         <button id="ok" type="button" uxp-variant="cta">Generate Colors</button>
     </div>
@@ -61,6 +62,12 @@ function generateLayout() {
 function validateColorInput(text) {
     if (text.length === 7) {
         return true;
+    }
+}
+
+function emptyDOMList(domObj) {
+    while (domObj.firstChild) {
+        domObj.removeChild(domObj.firstChild);
     }
 }
 
@@ -75,14 +82,19 @@ function createInteraction() {
             document.querySelector("#color-first .color-box").style.backgroundColor = color1;
         }
     });
-    inputColor2.addEventListener('change', (value) => {
-        color2 = `#${value}`;
-        const asd = document.querySelector("#color-first .color-box");
-        asd.style.backgroundColor = color2;
+    inputColor2.addEventListener('change', (event) => {
+        color2 = `#${event.target.value}`;
+        if (validateColorInput(color2)) {
+            document.querySelector("#color-second .color-box").style.backgroundColor = color2;
+        }
     });
 
     // Generate new colors in the LCH space when CTA is clicked
     document.querySelector("#ok").addEventListener("click", () => {
+        const colorList = document.querySelector("#color-list");
+        // empty color list
+        emptyDOMList(colorList);
+
         let colors = chroma.scale([color1, color2]).mode("lch").colors(6);
         console.log(colors);
         for (const color of colors) {
@@ -92,7 +104,7 @@ function createInteraction() {
                 <div class="color-box" style="background-color: ${color};"></div>
             </div>           
             `;
-            document.querySelector("#color-list").appendChild(colorListElement);    
+            colorList.appendChild(colorListElement);    
         }
     });
 }
