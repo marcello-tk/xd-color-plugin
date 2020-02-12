@@ -4,20 +4,19 @@
 
 const chroma = require("./node_modules/chroma-js/chroma");
 var color1 = `#FF850A`;
-var color2 = `navy`;
+var color2 = `#000080`;
 var panel;
-var numOfColors = 6;
-var colorCodeDisplayText = 'HEX';
 
 function generateLayout() {
     panel = document.createElement("panel");
     let container = document.createElement("div");
     container.innerHTML = `
     <style>
-        #input-colors-panel {
+        .multiple-column-layout {
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
+            padding-bottom: 6px;
         }
 
         .input-color-container {
@@ -31,6 +30,10 @@ function generateLayout() {
             margin-right: auto;
         }
 
+        #input-num-of-colors {
+            max-width: 66px;
+        }
+
         .color-box {
             border-radius: 2px;
             border: 1px solid black;
@@ -42,15 +45,39 @@ function generateLayout() {
             background-color: #ccc;
         }
 
+        .color-box-wide {
+            border-radius: 2px;
+            border: 1px solid black;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 4px;
+            height: 40px;
+            background-color: #ccc;
+            text-align: center;
+            vertical-align: center;
+        }
+
         #color-list li {
             position: relative;
             float: left;
             height: 40px;
             width: 40px;
         }
+
+        #input-colors-panel {
+            padding-bottom: 16px;
+        }
+
+        #generate-options {
+            padding-bottom: 16px;
+        }
+
+        #button-generate-color {
+            padding-bottom: 16px;
+        }
     </style>
 
-    <div id="input-colors-panel">
+    <div id="input-colors-panel" class="multiple-column-layout">
 
         <div id="color-first" class="input-color-container">
             <div class="color-box" style="background-color: ${color1};"></div>
@@ -64,29 +91,28 @@ function generateLayout() {
     </div>
 
     <div id="generate-options">
-        <table>
-            <tr>
-                <td>Number of generated colors<td>
-                <td><input type="number" value="${numOfColors}" maxlength=2 min=3 /></td>
-            </tr>
-            <tr>
-                <td>Primary color to display<td>
-                <td>
-                    <select id="color-code-display-list">
-                        <option value="HEX">HEX</option>
-                        <option value="RGB">RGB</option>
-                        <option value="HSB">HSB</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
+
+        <div class="multiple-column-layout">
+            <p>Number of generated colors</p>
+            <input id="input-num-of-colors" type="number" value="6" maxlength=2 min=2 />
+        </div>
+
+        <div class="multiple-column-layout">
+            <p>Primary color to display</p>
+            <select id="select-color-code-display">
+                <option value="HEX" selected="selected">HEX</option>
+                <option value="RGB">RGB</option>
+                <option value="HSB">HSB</option>
+            </select>
+        </div>
+
     </div>
 
     <div style="text-align: center;">
-        <button id="ok" type="button" uxp-variant="cta">Generate Colors</button>
+        <button id="button-generate-color" type="button" uxp-variant="cta">Generate Colors</button>
     </div>
 
-    <ul id="color-list"></ul>
+    <ul id="list-color"></ul>
     `;
     panel.appendChild(container);
 }
@@ -104,36 +130,39 @@ function emptyDOMList(domObj) {
 }
 
 function createInteraction() {
-    const inputColor1 = document.querySelector("#color-first");
-    const inputColor2 = document.querySelector("#color-second");
-
     // Handling input colors 1 and 2 -> change color on UI panel
-    inputColor1.addEventListener('change', (event) => {
+    document.querySelector("#color-first").addEventListener("change", (event) => {
         color1 = `#${event.target.value}`;
         if (validateColorInput(color1)) {
             document.querySelector("#color-first .color-box").style.backgroundColor = color1;
         }
     });
-    inputColor2.addEventListener('change', (event) => {
+    document.querySelector("#color-second").addEventListener("change", (event) => {
         color2 = `#${event.target.value}`;
         if (validateColorInput(color2)) {
             document.querySelector("#color-second .color-box").style.backgroundColor = color2;
         }
     });
 
+    // Handle color generation options
+    document.querySelector("#select-color-code-display").addEventListener("change", () => {
+        console.log("Selected color display text changed");
+    });
+
     // Generate new colors in the LCH space when CTA is clicked
-    document.querySelector("#ok").addEventListener("click", () => {
-        const colorList = document.querySelector("#color-list");
+    document.querySelector("#button-generate-color").addEventListener("click", () => {
+        const colorList = document.querySelector("#list-color");
         // empty color list
         emptyDOMList(colorList);
 
-        let colors = chroma.scale([color1, color2]).mode("lch").colors(numOfColors);
-        console.log(colors);
+        const numOfColors = document.querySelector("#input-num-of-colors").value;
+        const colors = chroma.scale([color1, color2]).mode("lch").colors(numOfColors);
+        //console.log(colors);
         for (const color of colors) {
             let colorListElement = document.createElement("li");
             colorListElement.innerHTML = `
             <div class="added-color">
-                <div class="color-box" style="background-color: ${color};"></div>
+                <div class="color-box-wide" style="color: white; background-color: ${color};">${color}</div>
             </div>           
             `;
             colorList.appendChild(colorListElement);    
