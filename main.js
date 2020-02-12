@@ -6,28 +6,40 @@ const chroma = require("./node_modules/chroma-js/chroma");
 var color1 = `#FF850A`;
 var color2 = `navy`;
 var panel;
+var numOfColors = 6;
+var colorCodeDisplayText = 'HEX';
 
 function generateLayout() {
     panel = document.createElement("panel");
     let container = document.createElement("div");
     container.innerHTML = `
     <style>
-        .input-color-container {
-            position: relative;
-            height: 40px;
+        #input-colors-panel {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
         }
+
+        .input-color-container {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .input-color-container input {
-            padding-left: 20px;
+            max-width: 78px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .color-box {
-            width: 20px;
-            height: 20px;
-            display: inline-block;
+            border-radius: 2px;
+            border: 1px solid black;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 4px;
+            width: 60px;
+            height: 40px;
             background-color: #ccc;
-            position: absolute;
-            left: 5px;
-            top: 5px;
         }
 
         #color-list li {
@@ -37,24 +49,44 @@ function generateLayout() {
             width: 40px;
         }
     </style>
-    <ul>
-        <li>
-            <div id="color-first" class="input-color-container">
-                <input type="text" value="Orange" maxlength=6 />
-                <div class="color-box" style="background-color: ${color1};"></div>
-            </div>
-        </li>
-        <li>
-            <div id="color-second" class="input-color-container">
-                <input type="text" value="Blue" maxlength=6 />
-                <div class="color-box" style="background-color: ${color2};"></div>
-            </div>
-        </li>
-    </ul>
-    <ul id="color-list"></ul>
+
+    <div id="input-colors-panel">
+
+        <div id="color-first" class="input-color-container">
+            <div class="color-box" style="background-color: ${color1};"></div>
+            <input type="text" value="${color1}" maxlength=7 />
+        </div>
+        <div id="color-second" class="input-color-container">
+            <div class="color-box" style="background-color: ${color2};"></div>
+            <input type="text" value="${color2}" maxlength=7 />
+        </div>
+
+    </div>
+
+    <div id="generate-options">
+        <table>
+            <tr>
+                <td>Number of generated colors<td>
+                <td><input type="number" value="${numOfColors}" maxlength=2 min=3 /></td>
+            </tr>
+            <tr>
+                <td>Primary color to display<td>
+                <td>
+                    <select id="color-code-display-list">
+                        <option value="HEX">HEX</option>
+                        <option value="RGB">RGB</option>
+                        <option value="HSB">HSB</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+
     <div style="text-align: center;">
         <button id="ok" type="button" uxp-variant="cta">Generate Colors</button>
     </div>
+
+    <ul id="color-list"></ul>
     `;
     panel.appendChild(container);
 }
@@ -95,7 +127,7 @@ function createInteraction() {
         // empty color list
         emptyDOMList(colorList);
 
-        let colors = chroma.scale([color1, color2]).mode("lch").colors(6);
+        let colors = chroma.scale([color1, color2]).mode("lch").colors(numOfColors);
         console.log(colors);
         for (const color of colors) {
             let colorListElement = document.createElement("li");
