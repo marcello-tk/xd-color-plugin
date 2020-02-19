@@ -2,10 +2,13 @@
  * Main file
  */
 
+const { ElementColorInput } = require("./ElementColorInput");
 const chroma = require("./node_modules/chroma-js/chroma");
-var color1 = `#FF850A`;
-var color2 = `#000080`;
+var color1 = "#FF850A";
+var color2 = "#000080";
 var panel;
+var elementColorInput1 = null;
+var elementColorInput2 = null;
 
 function generateLayout() {
     panel = document.createElement("panel");
@@ -94,7 +97,7 @@ function generateLayout() {
 
         <div class="multiple-column-layout">
             <p>Number of generated colors</p>
-            <input id="input-num-of-colors" type="number" value="6" maxlength=2 min=2 />
+            <input id="input-num-of-colors" type="number" value="6" maxlength=2 min=2 max=40 />
         </div>
 
         <div class="multiple-column-layout">
@@ -117,10 +120,9 @@ function generateLayout() {
     panel.appendChild(container);
 }
 
-function validateColorInput(text) {
-    if (text.length === 7) {
-        return true;
-    }
+function setupComponents () {
+    elementColorInput1 = new ElementColorInput("#color-first", color1);
+    elementColorInput2 = new ElementColorInput("#color-second", color2);
 }
 
 function emptyDOMList(domObj) {
@@ -130,23 +132,14 @@ function emptyDOMList(domObj) {
 }
 
 function createInteraction() {
-    // Handling input colors 1 and 2 -> change color on UI panel
-    document.querySelector("#color-first").addEventListener("change", (event) => {
-        color1 = `#${event.target.value}`;
-        if (validateColorInput(color1)) {
-            document.querySelector("#color-first .color-box").style.backgroundColor = color1;
-        }
-    });
-    document.querySelector("#color-second").addEventListener("change", (event) => {
-        color2 = `#${event.target.value}`;
-        if (validateColorInput(color2)) {
-            document.querySelector("#color-second .color-box").style.backgroundColor = color2;
-        }
-    });
-
     // Handle color generation options
     document.querySelector("#select-color-code-display").addEventListener("change", () => {
         console.log("Selected color display text changed");
+    });
+
+    // Validate color generation number
+    document.querySelector("#input-num-of-colors").addEventListener("change", () => {
+        console.log("Number of colors to generate changed");
     });
 
     // Generate new colors in the LCH space when CTA is clicked
@@ -156,8 +149,11 @@ function createInteraction() {
         emptyDOMList(colorList);
 
         const numOfColors = document.querySelector("#input-num-of-colors").value;
-        const colors = chroma.scale([color1, color2]).mode("lch").colors(numOfColors);
-        //console.log(colors);
+        const colors = chroma.scale([elementColorInput1.getColor(), elementColorInput2.getColor()])
+            .mode("lch")
+            .colors(numOfColors);
+
+        console.log(`Generated ${colors.length} colors`);
         for (const color of colors) {
             let colorListElement = document.createElement("li");
             colorListElement.innerHTML = `
@@ -173,6 +169,7 @@ function createInteraction() {
 function show(event) {
     generateLayout();
     event.node.appendChild(panel);
+    setupComponents();
     createInteraction();
 }
 
