@@ -3,12 +3,20 @@
  */
 
 const { ElementColorInput } = require("./ElementColorInput");
+const { Color } = require("scenegraph");
+const application = require("application");
+const clipboard = require("clipboard");
+const assets = require("assets");
 const chroma = require("./node_modules/chroma-js/chroma");
+
 var color1 = "#FF850A";
 var color2 = "#000080";
+var icon_add = "resources/icons/icon_add.png";
+var icon_copy = "resources/icons/icon_copy.png";
 var panel;
 var elementColorInput1 = null;
 var elementColorInput2 = null;
+var BreakException = {};
 
 function generateLayout() {
     panel = document.createElement("panel");
@@ -58,6 +66,12 @@ function generateLayout() {
             background-color: #ccc;
             text-align: center;
             vertical-align: center;
+        }
+
+        .color-box-wide img {
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
         }
 
         #color-list li {
@@ -112,8 +126,11 @@ function generateLayout() {
     </div>
 
     <div style="text-align: center;">
-        <button id="button-generate-color" type="button" uxp-variant="cta">Generate Colors</button>
+        <button id="button-generate-color" type="button"
+        title="Generate specified number of colors from gradient" uxp-variant="cta">Generate Colors</button>
     </div>
+
+    <hr />
 
     <ul id="list-color"></ul>
     `;
@@ -154,14 +171,36 @@ function createInteraction() {
             .colors(numOfColors);
 
         console.log(`Generated ${colors.length} colors`);
+
+        colorList.addEventListener("click", (e) => {
+            try {
+                document.querySelectorAll("p[id^=text-color]").forEach(p => {
+                    const color = p.innerHTML;
+                    if (e.target && e.target.id == `icon-add-${color}`) {
+                        application.editDocument(() => assets.colors.add([new Color(color)]) );
+                        throw BreakException;
+                    } else if (e.target && e.target.id == `icon-copy-${color}`) {
+                        clipboard.copyText(color);
+                        throw BreakException;
+                    }
+                });
+            } catch (e) {
+                if (e !== BreakException) throw e;
+            }
+        });
+
         for (const color of colors) {
             let colorListElement = document.createElement("li");
             colorListElement.innerHTML = `
             <div class="added-color">
-                <div class="color-box-wide" style="color: white; background-color: ${color};">${color}</div>
+                <div class="color-box-wide row" style="color: white; background-color: ${color};">
+                    <p>${color}</p>
+                    <img id="icon-add-${color}" src="${icon_add}" alt="Add" title="Add to assets"/>
+                    <img id="icon-copy-${color}" src="${icon_copy}" alt="Copy" title="Copy to clipboard"/>
+                </div>
             </div>           
             `;
-            colorList.appendChild(colorListElement);    
+            colorList.appendChild(colorListElement);
         }
     });
 }
