@@ -3,6 +3,7 @@
  */
 
 const { ElementColorInput } = require("./ElementColorInput");
+const { styleSheet } = require("./styleSheets");
 const { Color } = require("scenegraph");
 const application = require("application");
 const clipboard = require("clipboard");
@@ -21,86 +22,17 @@ var BreakException = {};
 function generateLayout() {
     panel = document.createElement("panel");
     let container = document.createElement("div");
-    container.innerHTML = `
-    <style>
-        .multiple-column-layout {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            padding-bottom: 6px;
-        }
-
-        .input-color-container {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .input-color-container input {
-            max-width: 78px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        #input-num-of-colors {
-            max-width: 66px;
-        }
-
-        .color-box {
-            border-radius: 2px;
-            border: 1px solid black;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 4px;
-            width: 60px;
-            height: 40px;
-            background-color: #ccc;
-        }
-
-        .color-box-wide {
-            border-radius: 2px;
-            border: 1px solid black;
-            margin-left: auto;
-            margin-right: auto;
-            padding: 4px;
-            height: 40px;
-            background-color: #ccc;
-            text-align: center;
-            vertical-align: center;
-        }
-
-        .color-box-wide img {
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-        }
-
-        #color-list li {
-            position: relative;
-            float: left;
-            height: 40px;
-            width: 40px;
-        }
-
-        #input-colors-panel {
-            padding-bottom: 16px;
-        }
-
-        #generate-options {
-            padding-bottom: 16px;
-        }
-
-        #button-generate-color {
-            padding-bottom: 16px;
-        }
-    </style>
-
+    container.setAttribute("id", "panel-container");
+    container.innerHTML = styleSheet() + `
     <div id="input-colors-panel" class="multiple-column-layout">
 
         <div id="color-first" class="input-color-container">
+            <label>Color #1</label>
             <div class="color-box" style="background-color: ${color1};"></div>
             <input type="text" value="${color1}" maxlength=7 />
         </div>
         <div id="color-second" class="input-color-container">
+            <label>Color #2</label>
             <div class="color-box" style="background-color: ${color2};"></div>
             <input type="text" value="${color2}" maxlength=7 />
         </div>
@@ -109,18 +41,26 @@ function generateLayout() {
 
     <div id="generate-options">
 
-        <div class="multiple-column-layout">
-            <p>Number of generated colors</p>
-            <input id="input-num-of-colors" type="number" value="6" maxlength=2 min=2 max=40 />
+        <div class="options">
+            <div class="options-label-container">
+                <label>Number of generated colors:</label>
+            </div>
+            <div>
+                <input id="input-num-of-colors" type="number" value="6" maxlength=2 min=2 max=40 />
+            </div>
         </div>
 
-        <div class="multiple-column-layout">
-            <p>Primary color to display</p>
+        <div class="options">
+            <div class="options-label-container">
+                <label>Primary color to display:</label>
+            </div>
+            <div>
             <select id="select-color-code-display">
                 <option value="HEX" selected="selected">HEX</option>
                 <option value="RGB">RGB</option>
                 <option value="HSB">HSB</option>
             </select>
+            </div>
         </div>
 
     </div>
@@ -173,6 +113,7 @@ function createInteraction() {
         console.log(`Generated ${colors.length} colors`);
 
         colorList.addEventListener("click", (e) => {
+            // BreakException is a way for me to break out of a forEach loop
             try {
                 document.querySelectorAll("p[id^=text-color]").forEach(p => {
                     const color = p.innerHTML;
@@ -194,9 +135,11 @@ function createInteraction() {
             colorListElement.innerHTML = `
             <div class="added-color">
                 <div class="color-box-wide row" style="color: white; background-color: ${color};">
-                    <p>${color}</p>
-                    <img id="icon-add-${color}" src="${icon_add}" alt="Add" title="Add to assets"/>
-                    <img id="icon-copy-${color}" src="${icon_copy}" alt="Copy" title="Copy to clipboard"/>
+                    <p><b>${color}</b></p>
+                    <div style="position: absolute; right: 1em;">
+                        <img id="icon-add-${color}" src="${icon_add}" alt="Add" title="Add to assets"/>
+                        <img id="icon-copy-${color}" src="${icon_copy}" alt="Copy" title="Copy to clipboard"/>
+                    </div>
                 </div>
             </div>           
             `;
