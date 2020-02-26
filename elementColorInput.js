@@ -1,6 +1,6 @@
 /**
- * A React-esque object that encapsulates the '#input-num-of-colors'
- * input field to hold past values and do proper checks in the same JS
+ * A React-esque object that encapsulates the '.input-color-container'
+ * DOM element to hold past values and do proper checks in the same JS
  * module.
  */
 
