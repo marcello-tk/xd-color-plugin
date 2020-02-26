@@ -1,20 +1,37 @@
-/*
+/*****************
  * Main file
+ *****************
  */
 
-const { ElementColorInput } = require("./ElementColorInput");
-const { styleSheet } = require("./styleSheets");
-const { Color } = require("scenegraph");
+/**
+ * Main imports
+ */
 const application = require("application");
 const clipboard = require("clipboard");
 const assets = require("assets");
 const chroma = require("./node_modules/chroma-js/chroma");
 
-var color1 = "#FF850A";
-var color2 = "#000080";
+/**
+ * My imports
+ */
+const { ElementColorInput } = require("./elementColorInput");
+const { ElementNumberInput } = require("./elementNumberInput");
+const { styleSheet } = require("./styleSheets");
+const { Color } = require("scenegraph");
+
+/**
+ * Resources
+ */
 var icon_add = "resources/icons/icon_add.png";
 var icon_copy = "resources/icons/icon_copy.png";
+
+/**
+ * Globals
+ */
+var color1 = "#FF850A";
+var color2 = "#000080";
 var panel;
+var elementMaxColorNumInput = null;
 var elementColorInput1 = null;
 var elementColorInput2 = null;
 var BreakException = {};
@@ -46,7 +63,7 @@ function generateLayout() {
                 <label>Number of generated colors:</label>
             </div>
             <div>
-                <input id="input-num-of-colors" type="number" value="6" maxlength=2 min=2 max=40 />
+                <input id="input-num-of-colors" type="number" value=6 maxlength=2 />
             </div>
         </div>
 
@@ -80,6 +97,7 @@ function generateLayout() {
 function setupComponents () {
     elementColorInput1 = new ElementColorInput("#color-first", color1);
     elementColorInput2 = new ElementColorInput("#color-second", color2);
+    elementMaxColorNumInput = new ElementNumberInput("#input-num-of-colors");
 }
 
 function emptyDOMList(domObj) {
@@ -94,18 +112,13 @@ function createInteraction() {
         console.log("Selected color display text changed");
     });
 
-    // Validate color generation number
-    document.querySelector("#input-num-of-colors").addEventListener("change", () => {
-        console.log("Number of colors to generate changed");
-    });
-
     // Generate new colors in the LCH space when CTA is clicked
     document.querySelector("#button-generate-color").addEventListener("click", () => {
         const colorList = document.querySelector("#list-color");
         // empty color list
         emptyDOMList(colorList);
 
-        const numOfColors = document.querySelector("#input-num-of-colors").value;
+        const numOfColors = elementMaxColorNumInput.getNumber();
         const colors = chroma.scale([elementColorInput1.getColor(), elementColorInput2.getColor()])
             .mode("lch")
             .colors(numOfColors);
