@@ -135,8 +135,8 @@ function createInteraction() {
             colorListElement.innerHTML = `
             <div class="added-color">
                 <div class="color-box-wide row" style="color: white; background-color: ${color};">
-                    <p><b>${color}</b></p>
-                    <div style="position: absolute; right: 1em;">
+                    <p style="font-size: 12pt;">${color}</p>
+                    <div style="position: absolute; right: 24px;">
                         <img id="icon-add-${color}" src="${icon_add}" alt="Add" title="Add to assets"/>
                         <img id="icon-copy-${color}" src="${icon_copy}" alt="Copy" title="Copy to clipboard"/>
                     </div>
